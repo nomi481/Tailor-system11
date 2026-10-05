@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#F0B823">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Tailor Register – Shalwar Kameez Sizes</title>
+<style>
+:root{--bg:#E3E9F2;--stripe:rgba(30,42,71,.08);--card:#fff;--ink:#1E2A47;--mut:#66708a;--tape:#F0B823;--line:#d5dae4;--red:#b3261e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101726;--stripe:rgba(255,255,255,.05);--card:#1b2438;--ink:#e8ecf5;--mut:#9aa5bf;--line:#2d3852}}
+:root[data-theme="dark"]{--bg:#101726;--stripe:rgba(255,255,255,.05);--card:#1b2438;--ink:#e8ecf5;--mut:#9aa5bf;--line:#2d3852}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg) repeating-linear-gradient(90deg,transparent 0 11px,var(--stripe) 11px 12px) fixed;color:var(--ink);font:16px/1.45 "Segoe UI",Roboto,Arial,sans-serif}
+header{background:var(--tape);color:#1E2A47;padding:18px 16px 14px;
+background-image:repeating-linear-gradient(90deg,transparent 0 9px,rgba(30,42,71,.55) 9px 10px);background-size:100% 10px;background-repeat:no-repeat;background-position:bottom}
+header h1{margin:0;font:700 24px Georgia,serif}
+header p{margin:2px 0 8px;font-size:14px}
+main{max-width:900px;margin:0 auto;padding:14px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+input,textarea,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
+input:focus,textarea:focus,button:focus-visible{outline:3px solid var(--tape);outline-offset:1px}
+button{padding:10px 14px;border:0;border-radius:8px;background:var(--ink);color:var(--card);font:600 15px inherit;cursor:pointer}
+button.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button.del{background:transparent;color:var(--red);border:1px solid var(--red)}
+.search{flex:1;min-width:180px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.row b{font-size:18px}.mut{color:var(--mut);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+label{font-size:13px;color:var(--mut);display:block;margin-bottom:3px}
+fieldset{border:1px solid var(--line);border-radius:10px;margin:14px 0;padding:12px}
+legend{font:700 17px Georgia,serif;padding:0 6px}
+.sz{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px 12px;margin:10px 0}
+.sz div{border-bottom:1px dotted var(--line);padding:3px 0}.sz span{font-size:12px;color:var(--mut);display:block}
+.sz strong{font-size:17px}
+.hide{display:none}
+#dlg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9}
+#dlg.hide{display:none}.dbox{background:var(--card);color:var(--ink);border-radius:12px;padding:18px;max-width:420px;width:100%}
+.b{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+.urg{background:#b3261e;color:#fff}.nor{background:var(--line);color:var(--ink)}.ok{background:#2e7d32;color:#fff}
+button.on{background:var(--ink);color:var(--card)}.pay{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.pay input{flex:1;min-width:110px}
+.empty{text-align:center;color:var(--mut);padding:30px 10px}
+@page{size:A5 portrait;margin:10mm}
+@media print{header,.bar,.acts,#nav,#dlg{display:none!important}body{background:#fff;background-image:none;color:#000;font-size:13px}main{padding:0}.card{border:0;padding:0}.mut{color:#333}.sz{grid-template-columns:repeat(3,1fr)}fieldset{border-color:#777;margin:8px 0;padding:8px}.b{border:1px solid #000;background:#fff!important;color:#000!important}}
+</style>
+</head>
+<body>
+<header><h1>Tailor Register</h1><p>Customer sizes for Shalwar &amp; Kameez</p></header>
+<main>
+<div class="bar" id="nav"><button id="tabC">Customers</button><button class="alt" id="tabP">Payments</button></div>
+<section id="listView">
+  <div class="bar">
+    <input class="search" id="q" placeholder="Search by name or phone" aria-label="Search customers">
+    <button id="newBtn">Add customer</button>
+  </div>
+  <div class="bar"><select id="flt" aria-label="Filter"><option value="all">All customers</option><option value="pending">Pending orders</option><option value="urgent">Urgent only</option><option value="done">Done (paid)</option></select></div>
+  <div id="list"></div>
+  <div class="card" id="bkCard"><div id="bkMsg"></div>
+    <div class="pay"><input id="bkMail" type="email" placeholder="Your email address" aria-label="Your email address"><button class="alt" id="bkSaveMail">Save email</button></div>
+    <div class="bar" style="margin:10px 0 0"><button id="bkSend">Email backup now</button></div>
+    <p class="mut" style="margin:8px 0 0">Tap the button, choose Gmail (or your email app), and send the file to yourself. Keep that email safe: if the app or phone is lost, open the file with Restore backup.</p></div>
+  <div class="bar" style="margin-top:14px">
+    <button class="alt" id="expBtn">Download backup</button>
+    <button class="alt" id="impBtn">Restore backup</button>
+    <input type="file" id="impFile" accept=".json,.txt,application/json,text/plain" class="hide">
+  </div>
+  <p class="mut" id="storeNote"></p>
+</section>
+
+<section id="formView" class="hide">
+  <h2 id="formTitle" style="font-family:Georgia,serif">New customer</h2>
+  <div class="grid">
+    <div><label>Name</label><input id="f_name"></div>
+    <div><label>Phone</label><input id="f_phone" inputmode="tel"></div>
+    <div><label>Priority</label><select id="f_pr"><option value="normal">Normal</option><option value="urgent">Urgent</option></select></div>
+    <div><label>Order date</label><input id="f_date" type="date"></div>
+    <div><label>Delivery date</label><input id="f_due" type="date"></div>
+    <div><label>Price (Rs)</label><input id="f_price" inputmode="numeric"></div>
+    <div><label>Advance paid (Rs)</label><input id="f_adv" inputmode="numeric"></div>
+  </div>
+  <fieldset><legend>Kameez (Shirt)</legend><div class="grid" id="kameez"></div></fieldset>
+  <fieldset><legend>Shalwar (Trouser)</legend><div class="grid" id="shalwar"></div></fieldset>
+  <div><label>Notes (style, collar type, pockets, etc.)</label><textarea id="f_notes" rows="3"></textarea></div>
+  <div class="bar" style="margin-top:14px">
+    <button id="saveBtn">Save customer</button>
+    <button class="alt" id="cancelBtn">Cancel</button>
+  </div>
+</section>
+
+<section id="viewView" class="hide"></section>
+
+<section id="payView" class="hide">
+  <h2 style="font-family:Georgia,serif">Receive payment</h2>
+  <input id="pq" placeholder="Type customer name or phone" aria-label="Search customer to pay">
+  <div id="payList" style="margin-top:12px"></div>
+</section>
+</main>
+
+<div id="dlg" class="hide" role="dialog" aria-modal="true"><div class="dbox"><p id="dmsg"></p><div class="bar"><button id="dyes" class="del">Yes</button><button class="alt" id="dno">Cancel</button></div></div></div>
+<script>
+var dcb=null;
+function ask(msg,yes,cb){$("dmsg").textContent=msg;dcb=cb||null;$("dyes").classList.toggle("hide",!cb);$("dyes").textContent=yes||"Yes";$("dno").textContent=cb?"Cancel":"OK";$("dlg").classList.remove("hide");$("dno").focus()}
+function say(msg){ask(msg)}
+var KEY="tailor_customers_v1";
+var KAMEEZ=[["k_len","Length (Lambai)"],["k_chest","Chest (Chaati)"],["k_waist","Waist (Kamar)"],["k_hip","Hip (Ghera)"],["k_sh","Shoulder (Teera)"],["k_sl","Sleeve (Baazu)"],["k_neck","Collar (Gala)"],["k_cuff","Cuff (Cuff)"]];
+var SHALWAR=[["s_len","Length (Lambai)"],["s_waist","Waist (Kamar)"],["s_hip","Hip"],["s_thigh","Thigh (Ran)"],["s_knee","Knee"],["s_bot","Bottom (Paancha)"]];
+var data=[],editId=null,memOnly=false;
+
+function load(){try{data=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){data=[];memOnly=true}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){memOnly=true;note()}try{localStorage.setItem("tailor_changes",String((+localStorage.getItem("tailor_changes")||0)+1))}catch(e){}}
+function note(){document.getElementById("storeNote").textContent=memOnly?"Warning: this browser is blocking saving. Use 'Download backup' often.":"Data is saved on this device and browser only. Download a backup now and then."}
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function show(v){["listView","formView","viewView","payView"].forEach(function(x){$(x).classList.toggle("hide",x!==v)});
+  $("nav").classList.toggle("hide",v==="formView"||v==="viewView");
+  $("tabC").className=v==="payView"?"alt":"";$("tabP").className=v==="payView"?"":"alt";window.scrollTo(0,0)}
+function paid(c){return (+c.adv||0)+(c.pays||[]).reduce(function(t,p){return t+(+p.amt||0)},0)}
+function bal(c){return Math.max(0,(+c.price||0)-paid(c))}
+function badge(c){return (c.done?'<span class="b ok">Done</span>':'')+'<span class="b '+(c.pr==="urgent"?'urg':'nor')+'">'+(c.pr==="urgent"?'Urgent':'Normal')+'</span>'}
+
+function fields(box,arr){$(box).innerHTML=arr.map(function(a){return '<div><label>'+a[1]+'</label><input id="f_'+a[0]+'" inputmode="decimal"></div>'}).join("")}
+fields("kameez",KAMEEZ);fields("shalwar",SHALWAR);
+
+function renderList(){
+  bkStatus();
+  var q=$("q").value.toLowerCase(),f=$("flt").value,L=$("list");
+  var r=data.filter(function(c){
+    if((c.name+" "+c.phone).toLowerCase().indexOf(q)<0)return false;
+    if(f==="pending")return !c.done; if(f==="urgent")return !c.done&&c.pr==="urgent"; if(f==="done")return !!c.done; return true;
+  }).sort(function(a,b){
+    var x=(a.done?2:0)+(a.pr==="urgent"?0:1),y=(b.done?2:0)+(b.pr==="urgent"?0:1);
+    return x-y||b.created-a.created});
+  if(!r.length){L.innerHTML='<div class="empty">'+(data.length?'No customer found here.':'No customers yet. Tap "Add customer" to save the first one.')+'</div>';return}
+  L.innerHTML=r.map(function(c){
+    return '<div class="card"><div class="row"><div><b>'+esc(c.name)+'</b>'+badge(c)+'<div class="mut">'+esc(c.phone)+(c.due?' · Delivery '+esc(c.due):'')+'</div></div>'+
+    '<div class="acts"><button data-v="'+c.id+'">Open</button> <button class="del" data-d="'+c.id+'">Delete</button></div></div>'+(c.price?'<div class="mut" style="margin-top:6px">'+(c.done?'Fully paid · Rs '+esc(c.price):'Balance due: Rs '+bal(c))+'</div>':'')+'</div>'}).join("");
+}
+
+function renderPay(){
+  var q=$("pq").value.trim().toLowerCase(),L=$("payList");
+  if(!q){L.innerHTML='<div class="empty">Search a customer by name to receive their payment.</div>';return}
+  var r=data.filter(function(c){return (c.name+" "+c.phone).toLowerCase().indexOf(q)>-1});
+  if(!r.length){L.innerHTML='<div class="empty">No customer found with this name.</div>';return}
+  L.innerHTML=r.map(function(c){
+    var h='<div class="card"><div class="row"><div><b>'+esc(c.name)+'</b>'+badge(c)+'<div class="mut">'+esc(c.phone)+'</div></div></div>';
+    if(!c.price)h+='<p class="mut">No price saved. Open the customer, tap Edit and add the price first.</p><button class="alt" data-open="'+c.id+'">Open customer</button>';
+    else{
+      h+='<p>Price: Rs '+esc(c.price)+' · Paid: Rs '+paid(c)+' · <b>Balance: Rs '+bal(c)+'</b></p>';
+      if(c.done)h+='<p style="color:#2e7d32;font-weight:700">Bill paid. Order is done.</p>';
+      else h+='<div class="pay"><input id="amt_'+c.id+'" inputmode="numeric" placeholder="Amount (Rs)" aria-label="Amount"><button data-pay="'+c.id+'">Receive</button><button class="alt" data-full="'+c.id+'">Pay full balance</button></div>';
+    }
+    h+='<div class="pay"><button class="alt" data-open="'+c.id+'">Open customer</button>'+(c.done?'<button class="alt" data-reopen="'+c.id+'">Reopen order</button>':'<button class="alt" data-markdone="'+c.id+'">Mark done</button>')+'</div></div>';
+    return h}).join("");
+}
+function exportWord(id){
+  var c=data.find(function(x){return x.id===id});if(!c)return;
+  function tbl(t,arr){return '<h3>'+t+'</h3><table border="1" cellspacing="0" cellpadding="4" width="100%" style="border-collapse:collapse">'+arr.map(function(a){return '<tr><td width="60%">'+a[1]+'</td><td><b>'+esc(c.m[a[0]]||"-")+'</b></td></tr>'}).join("")+'</table>'}
+  var html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>'+esc(c.name)+'</title>'+
+   '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]-->'+
+   '<style>@page Section1{size:14.8cm 21cm;margin:1cm 1cm 1cm 1cm;mso-page-orientation:portrait}div.Section1{page:Section1}body{font-family:Calibri,Arial,sans-serif;font-size:11pt}h2{margin:0 0 4px}h3{margin:12px 0 4px}</style></head><body><div class="Section1">'+
+   '<h2>'+esc(c.name)+'</h2><p>Phone: '+esc(c.phone||"-")+' &nbsp; Priority: '+(c.pr==="urgent"?"URGENT":"Normal")+'<br>Order date: '+esc(c.date||"-")+' &nbsp; Delivery: '+esc(c.due||"-")+'</p>'+
+   (c.price?'<p>Price: Rs '+esc(c.price)+' &nbsp; Paid: Rs '+paid(c)+' &nbsp; <b>Balance: Rs '+bal(c)+'</b></p>':'')+
+   tbl("Kameez (Shirt)",KAMEEZ)+tbl("Shalwar (Trouser)",SHALWAR)+(c.notes?'<p><b>Notes:</b> '+esc(c.notes)+'</p>':'')+'</div></body></html>';
+  var blob=new Blob(['\ufeff'+html],{type:"application/msword"}),a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);a.download=(c.name||"customer").replace(/[^\w\- ]+/g,"")+".doc";
+  document.body.appendChild(a);a.click();a.remove();
+}
+var LB="tailor_lastbackup",CH="tailor_changes",EM="tailor_email",asked=false;
+function gs(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function ss(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function needBk(){var t=+gs(LB)||0,n=+gs(CH)||0;return data.length>0&&(!t||n>=3||Date.now()-t>6048e5)}
+function bkStatus(){var t=+gs(LB)||0,n=+gs(CH)||0,d=t?Math.floor((Date.now()-t)/864e5):0,m;
+  if(!data.length)m="Backup: no customers to back up yet.";
+  else if(!t)m="You have never emailed a backup. Do it now to keep your customers safe.";
+  else m="Last backup: "+(d===0?"today":d+" day(s) ago")+(n?" · "+n+" change(s) not backed up":" · everything is backed up");
+  $("bkMsg").innerHTML='<b style="color:'+(needBk()?'var(--red)':'inherit')+'">'+esc(m)+'</b>'}
+function emailBackup(){
+  if(!data.length){say("There are no customers to back up yet.");return}
+  var txt=JSON.stringify(data),day=new Date().toISOString().slice(0,10),mail=gs(EM)||"",files=null;
+  function done(){ss(LB,String(Date.now()));ss(CH,"0");bkStatus()}
+  try{if(navigator.canShare){[["json","application/json"],["txt","text/plain"]].some(function(x){var f=new File([txt],"tailor-backup-"+day+"."+x[0],{type:x[1]});if(navigator.canShare({files:[f]})){files=[f];return true}})}}catch(e){files=null}
+  if(files){navigator.share({files:files,title:"Tailor backup "+day,text:"Tailor Register backup file. Send it to your own email."}).then(done).catch(function(){});return}
+  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type:"application/json"}));a.download="tailor-backup-"+day+".json";document.body.appendChild(a);a.click();a.remove();
+  ask("The backup file tailor-backup-"+day+".json was downloaded. Your email will open next: attach that file and press Send.","Open email",function(){done();location.href="mailto:"+encodeURIComponent(mail).replace(/%40/g,"@")+"?subject="+encodeURIComponent("Tailor backup "+day)+"&body="+encodeURIComponent("Attach the file tailor-backup-"+day+".json to this email, then send.")});
+}
+function addPay(id,amt){
+  var c=data.find(function(x){return x.id===id});if(!c)return;
+  amt=+amt;if(!(amt>0)){say("Enter the amount received.");return}
+  if(amt>bal(c)){say("This is more than the balance (Rs "+bal(c)+").");return}
+  c.pays=c.pays||[];c.pays.push({amt:amt,date:new Date().toISOString().slice(0,10)});
+  if(bal(c)<=0)c.done=true;
+  save();renderPay();renderList();
+}
+
+function openForm(c){
+  editId=c?c.id:null;c=c||{};
+  $("formTitle").textContent=c.id?"Edit customer":"New customer";
+  $("f_name").value=c.name||"";$("f_pr").value=c.pr||"normal";$("f_phone").value=c.phone||"";
+  $("f_date").value=c.date||new Date().toISOString().slice(0,10);
+  $("f_due").value=c.due||"";$("f_price").value=c.price||"";$("f_adv").value=c.adv||"";$("f_notes").value=c.notes||"";
+  KAMEEZ.concat(SHALWAR).forEach(function(a){$("f_"+a[0]).value=(c.m&&c.m[a[0]])||""});
+  show("formView");
+}
+
+function saveForm(){
+  var name=$("f_name").value.trim();
+  if(!name){say("Please enter the customer's name.");$("f_name").focus();return}
+  var m={};KAMEEZ.concat(SHALWAR).forEach(function(a){m[a[0]]=$("f_"+a[0]).value.trim()});
+  var rec={id:editId||String(Date.now()),created:Date.now(),pr:$("f_pr").value,name:name,phone:$("f_phone").value.trim(),date:$("f_date").value,due:$("f_due").value,price:$("f_price").value.trim(),adv:$("f_adv").value.trim(),notes:$("f_notes").value.trim(),m:m};
+  if(editId){var i=data.findIndex(function(x){return x.id===editId});if(i>-1){rec.created=data[i].created;rec.pays=data[i].pays;rec.done=data[i].done;data[i]=rec}}else data.push(rec);
+  save();renderList();show("listView");
+}
+
+function view(id){
+  var c=data.find(function(x){return x.id===id});if(!c)return;
+  function blk(t,arr){return '<fieldset><legend>'+t+'</legend><div class="sz">'+arr.map(function(a){return '<div><span>'+a[1]+'</span><strong>'+esc(c.m[a[0]]||"–")+'</strong></div>'}).join("")+'</div></fieldset>'}
+  $("viewView").innerHTML='<div class="card"><div class="row"><div><h2 style="margin:0;font-family:Georgia,serif">'+esc(c.name)+badge(c)+'</h2><div class="mut">'+esc(c.phone)+'</div></div></div>'+
+   '<p class="mut">Order: '+esc(c.date||"–")+' · Delivery: '+esc(c.due||"–")+'</p>'+
+   (c.price?'<p>Price: Rs '+esc(c.price)+' · Advance: Rs '+esc(c.adv||0)+' · <b>Balance: Rs '+bal(c)+'</b></p>':'')+
+   ((c.pays&&c.pays.length)?'<p class="mut">Payments: '+c.pays.map(function(p){return 'Rs '+p.amt+' ('+esc(p.date)+')'}).join(', ')+'</p>':'')+
+   blk("Kameez (Shirt)",KAMEEZ)+blk("Shalwar (Trouser)",SHALWAR)+
+   (c.notes?'<p><b>Notes:</b> '+esc(c.notes)+'</p>':'')+
+   '<div class="bar acts"><button data-e="'+c.id+'">Edit</button><button class="alt" id="prn">Print (A5)</button><button class="alt" id="wordBtn" data-w="'+c.id+'">Save as Word (A5)</button><button class="alt" id="back">Back</button><button class="del" data-d="'+c.id+'">Delete</button></div></div>';
+  show("viewView");
+}
+
+document.addEventListener("click",function(e){
+  var t=e.target;
+  if(t.dataset.v)view(t.dataset.v);
+  else if(t.dataset.e)openForm(data.find(function(x){return x.id===t.dataset.e}));
+  else if(t.dataset.d){var did=t.dataset.d,dn=data.find(function(x){return x.id===did});
+    ask("Delete "+(dn?dn.name:"this customer")+" and all their sizes permanently? This cannot be undone.","Yes, delete",function(){data=data.filter(function(x){return x.id!==did});save();renderList();renderPay();show("listView")})}
+  else if(t.dataset.pay)addPay(t.dataset.pay,$("amt_"+t.dataset.pay).value);
+  else if(t.dataset.full){var c=data.find(function(x){return x.id===t.dataset.full});if(c)addPay(c.id,bal(c))}
+  else if(t.dataset.open)view(t.dataset.open);
+  else if(t.dataset.markdone||t.dataset.reopen){var d=data.find(function(x){return x.id===(t.dataset.markdone||t.dataset.reopen)});if(d){d.done=!!t.dataset.markdone;save();renderPay();renderList()}}
+  else if(t.id==="back"){show("listView")}
+  else if(t.id==="prn"){window.print()}
+  else if(t.dataset.w){exportWord(t.dataset.w)}
+});
+$("newBtn").onclick=function(){openForm()};
+$("saveBtn").onclick=saveForm;
+$("cancelBtn").onclick=function(){show("listView")};
+$("dno").onclick=function(){dcb=null;$("dlg").classList.add("hide")};
+$("dyes").onclick=function(){var f=dcb;dcb=null;$("dlg").classList.add("hide");if(f)f()};
+$("bkSend").onclick=emailBackup;
+$("bkSaveMail").onclick=function(){var v=$("bkMail").value.trim();ss(EM,v);say(v?"Email saved: "+v:"Email cleared.")};
+$("q").oninput=renderList;$("flt").onchange=renderList;$("pq").oninput=renderPay;
+$("tabC").onclick=function(){show("listView")};
+$("tabP").onclick=function(){show("payView");renderPay()};
+$("expBtn").onclick=function(){
+  var a=document.createElement("a");a.href="data:application/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(data));
+  a.download="tailor-backup-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();a.remove();
+  setTimeout(function(){if(!document.hidden)say("If the backup did not download here, your browser blocked it. Open the app in its own tab and try again.")},800);
+};
+$("impBtn").onclick=function(){$("impFile").click()};
+$("impFile").onchange=function(){
+  var f=this.files[0];if(!f)return;var r=new FileReader();
+  r.onload=function(){try{var d=JSON.parse(r.result);if(!Array.isArray(d))throw 0;
+    var ids={};data.forEach(function(x){ids[x.id]=1});d.forEach(function(x){if(x&&x.id&&!ids[x.id])data.push(x)});
+    save();renderList();say("Backup restored.")}catch(e){say("This file is not a valid backup.")}};
+  r.readAsText(f);
+};
+load();note();renderList();
+$("bkMail").value=gs(EM)||"";
+if(needBk()&&!asked){asked=true;ask("Your customers are not safely backed up yet. Email a backup to yourself now?","Email backup",emailBackup)}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
+</script>
+</body>
+</html>
